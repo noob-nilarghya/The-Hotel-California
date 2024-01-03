@@ -40,7 +40,7 @@ Install my-project with npm
 
 **Client:** React, Redux, Styled-Components(CSS), Recharts
 
-**Server:** Supabase (along with react-router for global remote state management)
+**Server:** Supabase (along with react-query for global remote state management)
 
 
 ## Screenshots
