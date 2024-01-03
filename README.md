@@ -2,6 +2,7 @@
 # The Hotel California
 
 This is basically an internal website for The Hotel California employee. 
+
 It has various features like:
 
 
@@ -37,7 +38,7 @@ Install my-project with npm
     
 ## Tech Stack
 
-**Client:** React, Redux, Styled-Components(CSS)
+**Client:** React, Redux, Styled-Components(CSS), Recharts
 
 **Server:** Supabase (along with react-router for global remote state management)
 
