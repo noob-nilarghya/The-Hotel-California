@@ -44,18 +44,23 @@ Install my-project with npm
 
 ## Screenshots
 Dashboard-dark-mode:
+
 ![Dashboard-dark-mode](https://i.ibb.co/YTPkdCv/dashboard-dark.png)
 
 Dashboard-light-mode:
+
 ![Dashboard-light-mode](https://i.ibb.co/wJ3HtnY/dashboard-light.png)
 
 Bookings-dark-mode:
+
 ![Bookings-dark-mode](https://i.ibb.co/SsxbQcJ/bookings-dark.png)
 
 Cabins-dark-mode:
+
 ![Cabins-dark-mode](https://i.ibb.co/cJwTNrg/cabin-dark.png)
 
 Booking-Details-dark-mode:
+
 ![Booking-Details-dark-mode](https://i.ibb.co/y87NbJf/booking-detail-dark.png)
 
 
