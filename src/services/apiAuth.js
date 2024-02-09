@@ -29,7 +29,7 @@ export async function login({email, password}){
 }
 
 // see https://supabase.com/docs/reference/javascript/installing
-export async function getCurrentUser(){
+export async function getCurrentUser(){ // get the currently logged in user
     
     const { data : session, error } = await supabase.auth.getSession(); // Get the session data (from local storage/cache/session)
     if(!session.session) { return null; } // nothing is stored in local storage (JWT token expired)

@@ -1,0 +1,90 @@
+-------------- Implementation/Build Walkthorught --------------
+
+👉▶ [Main -> ErrorFallback -> App -> Nested Route (except ProtectedRoute) -> DarkModeContext]
+1. First of all open 'Main', go through error boundaries
+2. Then go to App, check out the route, how react-query instance is created, how dark mode is implemented [--Leave Protected Route for letter]
+
+
+👉▶ [Cabins -> CabinTable -> CabinRow -> CreateCabinForm -> EditCabinForm -> apiCabins (editCabin) -> CabinFilter -> Filter -> SortBy -> Select -> Pagination -> CabinTable]
+3. Go to Cabins -> CabinTable. See how read opn is performed using react-query:
+
+	const {isLoading, data: cabins, error}= useQuery({ 
+    		queryKey: ['cabins'], // This is the key, through which we can point to this table (or manupulate it letter)
+    		queryFn: () => getCabins() // that async function calling for retrieving data
+  	}); 
+
+   Also see how beautifully filter+sort is implemented by reading value from useParams() and filter our initial array based on params
+   How beautifully pagination is implemented
+4. See CabinRow, hoe mutate (CUD) opn is performed in react-query
+
+	const queryClient= useQueryClient(); // provide an instance of queryClient so that we can call invalidate method after row deletion
+	const {isLoading: isDeleting, mutate} = useMutation({ 
+    		mutationFn: (id) => deleteCabin(id), // async funct for deletion
+    		onSuccess: () => { // instruction to be performed on success
+      			toast.success("Cabin deleted successfully");
+			
+			// // we want react-query to re-fetch data after row deletion. We can make it happen by invalidating existing data, so that react-query can re-fetch the data
+      			queryClient.invalidateQueries({ 
+        			queryKey: ['cabins'] // telling which table to re-fetch (using that key [see cabinTable, 'useQuery'])
+      			});
+    		},
+    		onError: (err) => toast.error(err.message)
+  	});
+ 
+5. Now see CreateCabinForm, how beautify it is implemented using 'react-hook-form' (w/o any controlled ip), along with seamless form submission, validation and error handling
+6. In a similar way CabinRow->EditCabinForm is implemented. But see, 'myOwnSubmitFn'. There is a catch with image edit. See, 'oldImg' link is required coz on img updation, oldImg need to be removed
+	Case1: user dont updated their img (typeof (data.image) === 'string') -> pass (image: image, oldImg: "") to mutate fn
+	Case2: user updated img (typeof (data.image) === 'object') -> pass (image: data.image[0], oldImg: oldImg) to mutate fn
+7. See apiCabins->editCabin. See how img updation is taking place:
+     1. We first create a unique [imgName= `${Math.random()}-${newCabin.image.name}`.replaceAll('/','');]
+     2. create [imgURL= `${BASEURL}/${imgName}`;] NOTE: only update imgURL if used did upadted img, else [imageURL= newCabin.image;] (as it is)
+     3. Update info in database, and now its time to add newImg to bucket and create oldImg from bucket (if user did updated pic)
+     4. Retrieve imgName from oldImg URL, and remove that img by calling relevant supabase API with that imgName
+     5. Add newImg by calling supabase API with new imgName and imgFile
+6. Now to go Cabins->CabinFilter, see how reusable 'Filter' and 'SortBy' component are used to change params of URL using useParams.
+   So that letter on 'CabinTable' can read those params from URL and can sort/filter the result accordingly
+
+
+👉▶ [Bookings -> BookingFilter -> BookingTable -> BookingRow -> apiBookings -> SingleBooking -> BookingDetail -> Checkin -> CheckinBookings]
+7. In BookingRow, see checkOut mutation, and deleteMutation. Also see 'handleClickDetails' and 'handleClickCheckin', how both of those redirecting to `/checkin/${bookingId}`
+8. See App, on hitting `/checkin/:bookingId`, we open <SingleBooking /> and hence, we open <BookingDetail />
+9. In BookingDetail, we read bookingId from params, see checkOut mutation and how 'Checkin' button lead us to `/checkin/${booking.id}`, which open <Checkin /> (see App)
+10. <Checkin /> leads to <CheckinBookings> which is very very similar to <BookingDetails /> except that breakfast addon part
+
+
+👉▶ [Login -> LoginForm -> apiAuth -> Logout ->(AppLayout -> Header [to see position of Logout])
+11. Login->LoginForm, see how login mutation is implemented. Move to Logout, and see how logout mutation is implemented
+
+
+👉▶ [User -> SignupForm -> apiAuth]
+12. We have a link on the sidebar 'Create User' which leads to '/create-user', which display <Users /> and hence to <SignupForm />
+13. SignupForm have been implemented using 'react-hook-form', see how it takes care of errors and validations, formSubmit etc. See how signup mutation is performed
+
+
+👉▶ [Header -> UseAvatar -> ProtectedRoute -> App -> UseAvatar -> Account -> UpdateUserDataForm -> apiAuth -> updateUserData -> UpdatePasswordForm
+14. Header->UseAvatar, see how we fetch current logged in users info by calling supabse API with the help of react-query
+15. Now its time to finally implement ProtectedRoute, see how currentUser is fetched and logic is implemented. If user is not authenticated, 'navigate('/login')', else 'return children'
+16. Goto App, see how ProtectedRoute act as a safeguard wrapper for AppLayout(which is a nested route) behind which all pages resides. So non-authenticated user can't access it and redirects to '/login'
+17. Now get back to UseAvatar, see how clicking on it leads to '/account'. See App, it loads <Account />
+18. Goto UpdateUserDataForm(update fullName, image), again see how update mutation is taking place. Here we again needs to deal with img (so, see pt 6 and apiAuth->updateUserData)
+19. Now Go to UpdatePasswordForm, which we implemented using 'react-hook-form' (for confrmPwd validation) and rest are simple update mutation
+
+
+👉▶ [Dashboard -> DashboardFilter -> DashboardLayout -> apiBookings -> Stats -> Stat -> SalesChart -> DurationChart -> TodayActivity -> TodayItem]
+20. DashboardFilter changes url params in order to see last X days stats, which we read from DashboardLayout using useParams hook
+21. DashboardLayout fetch few things: 
+		a. bookings in last X days [today-numOfdays <= created_at <= toady]
+		b. stays (booked bookings in last X days [today-numOfdays <= startDate <= toady])
+		c. array of cabins (so that we can calculate number of cabins)
+22. With above info it shows <stats />, <SalesChart />(LineChart/AreaChart using recharts), <DurationChart > (Pie Chart using recharts)
+23. In TodayActivity, we fetch getStaysTodayActivity(apiBookings) which query for, guests who will check-in or check-out today:
+		(stay.status === 'unconfirmed' && isToday(new Date(stay.startDate))) [Basically guest arrived at hotel and will check-in today]
+  		OR (stay.status === 'checked-in' && isToday(new Date(stay.endDate))) [Guest want to checkout today and will leave]
+    Map over the fetch result and show <TodayItem />
+
+
+👉▶ Change of color theme based on info read from DarkModeContext. See, as it is a context, we can read 'isDarkMode' anywhre in the application
+    [DarkModeContext -> DarkModeToggle -> Logo -> GlobalStyles]
+24. Open 'styles/GlobalStyles.js' and see how we can easily change our color theme with styled-components
+
+		

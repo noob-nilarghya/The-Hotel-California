@@ -9,6 +9,7 @@ function DarkModeProvider({children}){
     // const [isDarkMode, setIsDarkMode] = useLocalStorageState(false, 'isDarkMode');
     // Rather instead of false, we want to use OS current theme as default value of dark-mode
     const [isDarkMode, setIsDarkMode] = useLocalStorageState(window.matchMedia('(prefers-color-scheme: dark)').matches, 'isDarkMode');
+    // This 'isDarkMode' become value and 'setIsDarkMode' become setValue of 'useLocalStorageState'
 
     function toggleDarkMode(){
         setIsDarkMode((dark) => !dark);

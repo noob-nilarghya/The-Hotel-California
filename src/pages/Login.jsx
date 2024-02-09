@@ -3,6 +3,7 @@ import LoginForm from "../features/authentication/LoginForm";
 import Logo from "../ui/Logo";
 import Heading from "../ui/Heading";
 import Row from '../ui/Row';
+import { useEffect } from "react";
 
 const LoginLayout = styled.main`
   min-height: 100vh;
@@ -15,6 +16,16 @@ const LoginLayout = styled.main`
 `;
 
 function Login() {
+
+  useEffect(function() {
+    const timer= setTimeout(()=> {
+      alert("For testing purpose, use below credentials:\nEmail: test@gmail.com || Password: test1234");
+    }, 1500);
+
+    return ()=> clearInterval(timer);
+    
+  }, []);
+
   return (
     <LoginLayout>
       <Logo></Logo>

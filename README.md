@@ -35,6 +35,16 @@ Install my-project with npm
   npm run dev
 ```
 
+## Test Credentials:
+
+This website is designed and intended for internal use, so only authenticated user can access the site.
+New user/employee account can only be created by existing authenticated (or logged in) user.
+But in order to access the web application, here is the test credentials:
+
+| Email Address  |   Password    |
+| -------------- |:-------------:|
+| test@gmail.com |    test1234   |
+
     
 ## Tech Stack
 

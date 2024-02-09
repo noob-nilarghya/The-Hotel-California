@@ -20,8 +20,8 @@ import Checkin from "./pages/Checkin";
 import ProtectedRoute from "./ui/ProtectedRoute";
 import { DarkModeProvider } from "./context/DarkModeContext";
 
-
-const queryClient= new QueryClient({ // creating a queryClient instance for setting up react-query for managing remote state
+// creating a queryClient instance for setting up react-query for managing remote state
+const queryClient= new QueryClient({ 
   defaultOptions: {
     queries: {
       staleTime: 0 * 1000 // for how long data should be cached (or staled)
